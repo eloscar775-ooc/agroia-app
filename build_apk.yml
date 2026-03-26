@@ -40,23 +40,23 @@ jobs:
       # 5. Instalar dependencias del proyecto
       - name: 📦 Instalar dependencias
         run: flutter pub get
-        working-directory: agroia_flutter
+      
 
       # 6. Analizar código (opcional, detecta errores)
       - name: 🔎 Analizar código
         run: flutter analyze --no-fatal-infos
-        working-directory: agroia_flutter
+      
         continue-on-error: true
 
       # 7. Compilar APK debug (sin firma — instala directamente)
       - name: 🔨 Compilar APK Debug
         run: flutter build apk --debug
-        working-directory: agroia_flutter
+      
 
       # 8. Compilar APK release (versión final)
       - name: 🏗️ Compilar APK Release
         run: flutter build apk --release --no-shrink
-        working-directory: agroia_flutter
+       
 
       # 9. Subir APK debug como artifact descargable
       - name: 📤 Subir APK Debug
