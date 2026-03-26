@@ -1,25 +1,41 @@
-name: agroia
-description: AgroIA - Asistente Inteligente de Maíz
-publish_to: 'none'
-version: 1.0.0+1
+name: 🌽 AgroIA App Build APK
 
-environment:
-  sdk: '>=3.0.0 <4.0.0'
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-dependencies:
-  flutter:
-    sdk: flutter
-  http: ^1.2.0
-  shared_preferences: ^2.2.2
-  image_picker: ^1.0.7
-  provider: ^6.1.2
-  cupertino_icons: ^1.0.6
-  flutter_markdown: ^0.6.22
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
+    steps:
+      - name: 📥 Checkout del código
+        uses: actions/checkout@v3
 
-flutter:
-  uses-material-design: true
+      - name: ☕ Configurar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🚀 Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0' # O la versión que uses
+          channel: 'stable'
+
+      - name: 📦 Instalar dependencias
+        run: flutter pub get
+
+      - name: 🛠️ Construir APK
+        run: flutter build apk --release --no-tree-shake-icons
+
+      - name: 📤 Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: agroia-app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
