@@ -1,0 +1,374 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║        GUÍA COMPLETA: SUBIR A GITHUB + COMPILAR APK ANDROID            ║
+║        Cuenta: eloscar775-ooc                                           ║
+║        Kali Linux — Copia y pega cada bloque en orden                  ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 1 — INSTALAR GIT EN KALI LINUX
+═══════════════════════════════════════════════════════════════════════════
+
+sudo apt update && sudo apt install git -y
+git --version
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 2 — CONFIGURAR TU IDENTIDAD EN GIT (solo se hace una vez)
+═══════════════════════════════════════════════════════════════════════════
+
+git config --global user.name "eloscar775-ooc"
+git config --global user.email "TU_EMAIL@gmail.com"
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 3 — CREAR LOS 2 REPOSITORIOS EN GITHUB
+═══════════════════════════════════════════════════════════════════════════
+
+Ve a https://github.com/new y crea ESTOS DOS repos:
+
+  Repo 1: agroia-backend    (para el código Python/FastAPI)
+  Repo 2: agroia-app        (para la app Flutter/Android)
+
+  Configuración para cada uno:
+  ✅ Público (o Privado — los dos funcionan)
+  ❌ NO marques "Initialize this repository"
+  ❌ NO agregar .gitignore ni licencia todavía
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 4 — CREAR TOKEN DE ACCESO EN GITHUB (para subir desde terminal)
+═══════════════════════════════════════════════════════════════════════════
+
+1. Ve a: https://github.com/settings/tokens/new
+2. Note: AgroIA Deploy
+3. Expiration: 90 days (o sin expiración)
+4. Permisos: marca ✅ "repo" (acceso completo a repos)
+5. Clic en "Generate token"
+6. COPIA EL TOKEN — solo aparece una vez
+   Ejemplo: ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 5 — SUBIR EL BACKEND (Python/FastAPI)
+═══════════════════════════════════════════════════════════════════════════
+
+# Crear carpeta y entrar
+mkdir -p ~/agroia-backend
+cd ~/agroia-backend
+
+# Copiar todos los archivos del backend que descargaste
+# (app.py, database.py, config.py, requirements.txt, .env.example, README.md)
+# y las carpetas routers/ y services/
+
+# Crear .gitignore para no subir cosas privadas
+cat > .gitignore << 'EOF'
+.env
+__pycache__/
+*.pyc
+*.pyo
+agroia.db
+data/pdfs/
+data/fotos/
+data/vectordb/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+EOF
+
+# Crear carpetas de datos (vacías, con .gitkeep)
+mkdir -p data/pdfs data/fotos data/vectordb routers services
+touch data/pdfs/.gitkeep data/fotos/.gitkeep data/vectordb/.gitkeep
+touch routers/__init__.py services/__init__.py
+
+# Inicializar git
+git init
+git add .
+git commit -m "🌽 AgroIA Backend v1.0 - FastAPI + IA + RAG"
+
+# Conectar con GitHub (reemplaza TU_TOKEN con el token del paso 4)
+git remote add origin https://TU_TOKEN@github.com/eloscar775-ooc/agroia-backend.git
+git branch -M main
+git push -u origin main
+
+✅ Si ves "Branch 'main' set up to track..." — ¡subió correctamente!
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 6 — SUBIR LA APP FLUTTER (Android)
+═══════════════════════════════════════════════════════════════════════════
+
+# Crear carpeta y entrar
+mkdir -p ~/agroia-app
+cd ~/agroia-app
+
+# Copiar TODOS los archivos de la app Flutter:
+# - pubspec.yaml
+# - lib/ (con todos los .dart)
+# - android/ (con AndroidManifest.xml)
+# - .github/ (con workflows/build_apk.yml)  ← MUY IMPORTANTE
+
+# Crear estructura mínima de Flutter que falta
+mkdir -p android/app/src/main/res/mipmap-hdpi
+mkdir -p android/app/src/main/res/values
+mkdir -p android/app/src/main/kotlin/com/agroia/app
+
+# Crear build.gradle de la app
+cat > android/app/build.gradle << 'EOF'
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace "com.agroia.app"
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    defaultConfig {
+        applicationId "com.agroia.app"
+        minSdkVersion 21
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+EOF
+
+# Crear build.gradle del proyecto
+cat > android/build.gradle << 'EOF'
+buildscript {
+    ext.kotlin_version = '1.9.0'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+EOF
+
+# Crear settings.gradle
+cat > android/settings.gradle << 'EOF'
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        return flutterSdkPath
+    }()
+    includeBuild("${flutterSdkPath}/packages/flutter_tools/gradle")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
+}
+
+include ":app"
+EOF
+
+# Crear MainActivity.kt
+mkdir -p android/app/src/main/kotlin/com/agroia/app
+cat > android/app/src/main/kotlin/com/agroia/app/MainActivity.kt << 'EOF'
+package com.agroia.app
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity()
+EOF
+
+# Crear local.properties (Flutter la necesita)
+cat > android/local.properties << 'EOF'
+flutter.sdk=/opt/hostedtoolcache/flutter
+flutter.buildMode=debug
+flutter.versionCode=1
+flutter.versionName=1.0.0
+EOF
+
+# .gitignore para Flutter
+cat > .gitignore << 'EOF'
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+android/local.properties
+android/.gradle
+android/key.properties
+*.jks
+ios/Flutter/.last_build_id
+*.DS_Store
+Thumbs.db
+EOF
+
+# Inicializar git
+git init
+git add .
+git commit -m "🌽 AgroIA App v1.0 - Flutter Android con GitHub Actions"
+
+# Conectar con GitHub
+git remote add origin https://TU_TOKEN@github.com/eloscar775-ooc/agroia-app.git
+git branch -M main
+git push -u origin main
+
+✅ ¡Listo! GitHub Actions comenzará a compilar automáticamente.
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 7 — VER LA COMPILACIÓN EN GITHUB
+═══════════════════════════════════════════════════════════════════════════
+
+1. Ve a: https://github.com/eloscar775-ooc/agroia-app
+2. Clic en la pestaña "Actions" (arriba)
+3. Verás: "🌽 AgroIA — Build Android APK" corriendo
+4. Tiempo de compilación: ~5-10 minutos la primera vez
+5. Cuando termine verás ✅ verde
+
+Para descargar el APK:
+  Opción A — Via Releases:
+    https://github.com/eloscar775-ooc/agroia-app/releases
+    → Descarga app-release.apk
+
+  Opción B — Via Artifacts:
+    Clic en el workflow que terminó ✅
+    → Scroll hasta abajo → "Artifacts"
+    → Descarga "AgroIA-release-apk"
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 8 — INSTALAR EL APK EN TU ANDROID
+═══════════════════════════════════════════════════════════════════════════
+
+En tu teléfono Android:
+1. Ajustes → Seguridad → "Instalar apps desconocidas" → Activa para tu navegador
+2. Descarga el APK desde GitHub (con el navegador del teléfono)
+3. Toca el archivo descargado → Instalar
+4. Abre "AgroIA"
+5. Ve a ⚙️ Configuración → pon la URL de tu servidor:
+   http://TU_IP_LOCAL:8000/api
+   (TU_IP_LOCAL es la IP de tu computadora donde corre el backend)
+
+
+═══════════════════════════════════════════════════════════════════════════
+PASO 9 — ARRANCAR EL BACKEND (Python)
+═══════════════════════════════════════════════════════════════════════════
+
+# En otra terminal de Kali Linux:
+cd ~/agroia-backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Configurar API key
+cp .env.example .env
+nano .env
+# → Escribe tu ANTHROPIC_API_KEY=sk-ant-...
+
+# Arrancar servidor
+python app.py
+
+# Ver tu IP local (para configurar en la app):
+hostname -I
+# → Ejemplo: 192.168.1.105
+# → En la app pon: http://192.168.1.105:8000/api
+
+
+═══════════════════════════════════════════════════════════════════════════
+COMANDOS PARA ACTUALIZAR (cuando hagas cambios)
+═══════════════════════════════════════════════════════════════════════════
+
+# Cada vez que cambies el código y quieras re-compilar:
+
+# Backend:
+cd ~/agroia-backend
+git add .
+git commit -m "Actualización del backend"
+git push
+
+# App:
+cd ~/agroia-app
+git add .
+git commit -m "Actualización de la app"
+git push
+# → GitHub Actions compila automáticamente el nuevo APK
+
+
+═══════════════════════════════════════════════════════════════════════════
+SOLUCIÓN DE PROBLEMAS COMUNES
+═══════════════════════════════════════════════════════════════════════════
+
+❌ "Authentication failed" al hacer push:
+   → Verifica que el token sea correcto en la URL:
+   git remote set-url origin https://TU_TOKEN@github.com/eloscar775-ooc/agroia-app.git
+
+❌ El workflow falla con error de Flutter:
+   → Ve a Actions → clic en el workflow rojo → lee el error
+   → Generalmente es un import faltante o error de sintaxis
+
+❌ La app no conecta con el backend:
+   → Verifica que el teléfono y la PC estén en el mismo WiFi
+   → Usa hostname -I en Kali para ver tu IP correcta
+   → En la app: ⚙️ → cambia la URL
+
+❌ "Fuentes desconocidas" bloqueado en Android:
+   → Ajustes → Privacidad → Instalar apps desconocidas
+   → O Ajustes → Biometría y seguridad → Instalar apps desconocidas
+   (depende del modelo del teléfono)
+
+══════════════════════════════════════════════════════════════════════════
