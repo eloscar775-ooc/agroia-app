@@ -1,10 +1,10 @@
 name: agroia
-description: AgroIA - Asistente Inteligente de Maíz
-publish_to: 'none'
+description: AgroIA - Asistente Inteligente de Maiz
+publish_to: none
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -14,7 +14,6 @@ dependencies:
   image_picker: ^1.0.7
   provider: ^6.1.2
   cupertino_icons: ^1.0.6
-  flutter_markdown: ^0.6.22
 
 dev_dependencies:
   flutter_test:
