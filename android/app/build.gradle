@@ -3,44 +3,26 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
-
 android {
     namespace "com.agroia.app"
     compileSdk 34
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
+    kotlinOptions { jvmTarget = '17' }
     defaultConfig {
-        // Este es el ID único de tu app en la Play Store
         applicationId "com.agroia.app"
-        // minSdk 21 asegura compatibilidad con Android 5.0+
         minSdk 21
         targetSdk 34
         versionCode 1
         versionName "1.0"
     }
-
     buildTypes {
         release {
-            // Usamos la firma de debug temporalmente para que GitHub no pida archivos JKS
             signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
         }
     }
-}
-
-flutter {
-    source '../..'
-}
-
-dependencies {
-    // Aquí puedes agregar librerías nativas si las necesitas
 }
