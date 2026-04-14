@@ -3,17 +3,22 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
+
 android {
-    namespace "com.agroia.app"
+    namespace "com.agroia.app" // Asegúrate de que este sea tu ID de paquete
     compileSdk 34
-    ndkVersion "25.1.8937393"
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = '17'
     }
+    
+    // ... el resto del archivo (defaultConfig, buildTypes, etc.) se queda igual
+}
     defaultConfig {
         applicationId "com.agroia.app"
         minSdk 21
