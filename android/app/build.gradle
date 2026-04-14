@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace "com.agroia.app" // Asegúrate de que este sea tu ID de paquete
+    namespace "com.agroia.app"
     compileSdk 34
 
     compileOptions {
@@ -16,24 +16,31 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
-    
-    // ... el resto del archivo (defaultConfig, buildTypes, etc.) se queda igual
-}
+
     defaultConfig {
+        // Este es el ID único de tu app en la Play Store
         applicationId "com.agroia.app"
+        // minSdk 21 asegura compatibilidad con Android 5.0+
         minSdk 21
         targetSdk 34
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
     }
+
     buildTypes {
         release {
+            // Usamos la firma de debug temporalmente para que GitHub no pida archivos JKS
             signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
         }
     }
 }
+
 flutter {
-    source "../.."
+    source '../..'
+}
+
+dependencies {
+    // Aquí puedes agregar librerías nativas si las necesitas
 }
