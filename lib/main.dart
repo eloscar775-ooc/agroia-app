@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/parcelas_screen.dart';
-import 'screens/diagnostico_screen.dart';
-import 'screens/chat_screen.dart';
-import 'screens/costos_screen.dart';
+import 'all_screens.dart';
+import 'all_screens.dart';
+import 'all_screens.dart';
+import 'all_screens.dart';
+import 'all_screens.dart';
 import 'providers/app_provider.dart';
 
 void main() {
