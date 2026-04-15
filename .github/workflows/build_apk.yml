@@ -7,52 +7,36 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Flutter 3.24
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
           channel: stable
           cache: true
-
       - name: local.properties
         run: |
-          FLUTTER_BIN=$(which flutter)
-          FLUTTER_SDK=$(dirname $(dirname $FLUTTER_BIN))
-          echo "flutter.sdk=$FLUTTER_SDK" > android/local.properties
+          FSDK=$(dirname $(dirname $(which flutter)))
+          echo "flutter.sdk=$FSDK" > android/local.properties
           echo "flutter.buildMode=release" >> android/local.properties
           echo "flutter.versionCode=1" >> android/local.properties
           echo "flutter.versionName=1.0.0" >> android/local.properties
           echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
-          cat android/local.properties
-
-      - name: flutter pub get
-        run: flutter pub get
-
-      - name: Build APK release
-        run: flutter build apk --release --no-tree-shake-icons
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - run: flutter pub get
+      - run: flutter build apk --release --no-tree-shake-icons
+      - uses: actions/upload-artifact@v4
         with:
           name: AgroIA-APK
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
-
-      - name: GitHub Release
-        uses: ncipollo/release-action@v1
+      - uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: "v1.0.${{ github.run_number }}"
           name: "AgroIA v1.0.${{ github.run_number }}"
-          body: "Instala app-release.apk en tu Android. Activa Fuentes desconocidas en Ajustes."
+          body: "Descarga app-release.apk e instalala. Activa Fuentes desconocidas en Ajustes."
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
