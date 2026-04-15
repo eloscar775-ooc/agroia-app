@@ -19,8 +19,6 @@ class AgroIAApp extends StatelessWidget {
     theme: ThemeData(
       colorScheme: const ColorScheme.dark(primary: Color(0xFF2ECC71), surface: Color(0xFF1A2A1E)),
       scaffoldBackgroundColor: const Color(0xFF0A0F0D), useMaterial3: true,
-      appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF111A14), foregroundColor: Color(0xFFE8F5EC), elevation: 0),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: Color(0xFF111A14), selectedItemColor: Color(0xFF2ECC71), unselectedItemColor: Color(0xFF9DBFA8)),
     ),
     home: const HomeNav(),
   );
@@ -28,8 +26,7 @@ class AgroIAApp extends StatelessWidget {
 
 class HomeNav extends StatefulWidget {
   const HomeNav({super.key});
-  @override
-  State<HomeNav> createState() => _HomeNavState();
+  @override State<HomeNav> createState() => _HomeNavState();
 }
 class _HomeNavState extends State<HomeNav> {
   int _idx = 0;
