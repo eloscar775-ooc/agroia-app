@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
 import '../providers/app_provider.dart';
-import '../services/api_service.dart';
-import '../widgets/stat_card.dart';
-import '../widgets/alerta_card.dart';
-import '../widgets/clima_widget.dart';
+// import '../services/api_service.dart';
+// import '../widgets/stat_card.dart';
+// import '../widgets/alerta_card.dart';
+// import '../widgets/clima_widget.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD
@@ -64,7 +64,7 @@ class DashboardScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: StatCard(
+                        child: // StatCard(
                           icon: 'Campo',
                           value: '${parcelas.length}',
                           label: 'Parcelas',
@@ -73,7 +73,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: StatCard(
+                        child: // StatCard(
                           icon: 'Area',
                           value:
                               '${parcelas.fold<double>(0, (s, p) => s + (p['superficie_ha'] ?? 0)).toStringAsFixed(1)} ha',
@@ -86,7 +86,7 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // Clima
-                  if (clima != null) ClimaWidget(clima: clima),
+                  if (clima != null) // ClimaWidget(clima: clima),
                   const SizedBox(height: 16),
 
                   // Alerta IA
@@ -162,21 +162,21 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const AlertaCard(
+                  // const AlertaCard(
                     nivel: 'critico',
                     icon: 'Plaga',
                     titulo: 'Riesgo: Gusano cogollero',
                     descripcion:
                         'Parcela La Loma - Dia 42. Temperatura favorable para plaga.',
                   ),
-                  const AlertaCard(
+                  // const AlertaCard(
                     nivel: 'advertencia',
                     icon: 'Tiempo',
                     titulo: 'Fertilizar El Bajo',
                     descripcion:
                         'Dia 18 - Ventana optima para 2da fertilizacion de nitrogeno.',
                   ),
-                  const AlertaCard(
+                  // const AlertaCard(
                     nivel: 'ok',
                     icon: 'Agua',
                     titulo: 'Riego completado',
@@ -874,7 +874,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final provider = context.read<AppProvider>();
-      final api = ApiService(provider.apiUrl);
+      final api = // ApiService(provider.apiUrl);
       final resp = await api.enviarMensajeChat(
         pregunta: texto,
         cicloId: provider.cicloActivoId,

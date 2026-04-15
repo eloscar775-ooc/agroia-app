@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/api_service.dart';
+// import '../services/api_service.dart';
 
 class AppProvider extends ChangeNotifier {
   // URL del backend — CAMBIA ESTO a tu IP o dominio de Railway/Render
