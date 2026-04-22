@@ -12,23 +12,18 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '11'
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.13.9'
           channel: stable
           cache: true
-
-      - name: Eliminar Java si existe
-        run: |
-          rm -rf android/app/src/main/java || true
 
       - name: Crear local.properties
         run: |
           FSDK=$(dirname $(dirname $(which flutter)))
           echo "flutter.sdk=$FSDK" > android/local.properties
-          echo "flutter.buildMode=release" >> android/local.properties
           echo "flutter.versionCode=1" >> android/local.properties
           echo "flutter.versionName=1.0.0" >> android/local.properties
           echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
@@ -37,16 +32,11 @@ jobs:
       - name: flutter pub get
         run: flutter pub get
 
-      - name: Verificar estructura
+      - name: Verificar archivos
         run: |
-          echo "=== pubspec.yaml ==="
-          cat pubspec.yaml
-          echo "=== lib/ ==="
           find lib/ -name "*.dart" | sort
-          echo "=== android/app/src/main/kotlin/ ==="
-          find android/app/src/main/kotlin/ -type f | sort
-          echo "=== NO Java ==="
-          find android/ -name "*.java" | sort || echo "Sin archivos java - OK"
+          find android/ -name "*.java" && echo "ERROR: hay java" || echo "Sin java OK"
+          find android/ -name "*.kt" | sort
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
@@ -62,6 +52,6 @@ jobs:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: "v1.0.${{ github.run_number }}"
           name: "AgroIA v1.0.${{ github.run_number }}"
-          body: "Descarga app-release.apk e instalala en Android. Activa Fuentes desconocidas en Ajustes."
+          body: "Descarga app-release.apk e instalala. Activa Fuentes desconocidas en Ajustes de Android."
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
