@@ -12,11 +12,11 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.9'
+          flutter-version: '3.22.3'
           channel: stable
           cache: true
 
@@ -27,16 +27,11 @@ jobs:
           echo "flutter.versionCode=1" >> android/local.properties
           echo "flutter.versionName=1.0.0" >> android/local.properties
           echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
-          cat android/local.properties
 
-      - name: flutter pub get
-        run: flutter pub get
+      - name: Limpiar java si existe
+        run: rm -rf android/app/src/main/java || true
 
-      - name: Verificar archivos
-        run: |
-          find lib/ -name "*.dart" | sort
-          find android/ -name "*.java" && echo "ERROR: hay java" || echo "Sin java OK"
-          find android/ -name "*.kt" | sort
+      - run: flutter pub get
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
@@ -52,6 +47,6 @@ jobs:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: "v1.0.${{ github.run_number }}"
           name: "AgroIA v1.0.${{ github.run_number }}"
-          body: "Descarga app-release.apk e instalala. Activa Fuentes desconocidas en Ajustes de Android."
+          body: "Descarga app-release.apk e instalala. Activa Fuentes desconocidas en Ajustes."
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
