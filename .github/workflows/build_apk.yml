@@ -8,16 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
           channel: stable
           cache: true
-      - name: local.properties
+
+      - name: Eliminar Java si existe
+        run: |
+          rm -rf android/app/src/main/java || true
+
+      - name: Crear local.properties
         run: |
           FSDK=$(dirname $(dirname $(which flutter)))
           echo "flutter.sdk=$FSDK" > android/local.properties
@@ -25,18 +32,36 @@ jobs:
           echo "flutter.versionCode=1" >> android/local.properties
           echo "flutter.versionName=1.0.0" >> android/local.properties
           echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
-      - run: flutter pub get
-      - run: flutter build apk --release --no-tree-shake-icons
+          cat android/local.properties
+
+      - name: flutter pub get
+        run: flutter pub get
+
+      - name: Verificar estructura
+        run: |
+          echo "=== pubspec.yaml ==="
+          cat pubspec.yaml
+          echo "=== lib/ ==="
+          find lib/ -name "*.dart" | sort
+          echo "=== android/app/src/main/kotlin/ ==="
+          find android/app/src/main/kotlin/ -type f | sort
+          echo "=== NO Java ==="
+          find android/ -name "*.java" | sort || echo "Sin archivos java - OK"
+
+      - name: Build APK
+        run: flutter build apk --release --no-tree-shake-icons
+
       - uses: actions/upload-artifact@v4
         with:
           name: AgroIA-APK
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: "v1.0.${{ github.run_number }}"
           name: "AgroIA v1.0.${{ github.run_number }}"
-          body: "Descarga app-release.apk e instalala. Activa Fuentes desconocidas en Ajustes."
+          body: "Descarga app-release.apk e instalala en Android. Activa Fuentes desconocidas en Ajustes."
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
